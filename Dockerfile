@@ -1,4 +1,4 @@
-﻿# Base dotnet image
+# Base dotnet image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 80
@@ -19,10 +19,10 @@ COPY . .
 WORKDIR "/src"
 
 # unit test and code coverage
-RUN dotnet test CentralAnimalDataStore.Test
+RUN dotnet test CAS.Test
 
 FROM build AS publish
-RUN dotnet publish CentralAnimalDataStore -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish CAS.Api -c Release -o /app/publish /p:UseAppHost=false
 
 
 ENV ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
@@ -32,4 +32,4 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 EXPOSE 8085
-ENTRYPOINT ["dotnet", "CentralAnimalDataStore.dll"]
+ENTRYPOINT ["dotnet", "CAS.Api.dll"]
