@@ -2,6 +2,7 @@ version: '3.4'
 name: 'CAS API Local Development Environment'
 services:
   localstack:
+    container_name: "localstack-emulator"
     image: localstack/localstack:3.0.2
     ports:
       - '4566:4566' # LocalStack Gateway
