@@ -5,7 +5,7 @@ using Amazon.SQS;
 using Amazon.SQS.Model;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CAS.Test.TestUtils;
+namespace CAS.Integration.Test.TestUtils;
 
 [Trait("Dependence", "localstack")]
 public class QueueTestBase : IDisposable

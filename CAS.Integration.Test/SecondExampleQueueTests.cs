@@ -1,8 +1,8 @@
 using CAS.Core.Consumers;
-using CAS.Test.TestUtils;
+using CAS.Integration.Test.TestUtils;
 using NSubstitute;
 
-namespace CAS.Test;
+namespace CAS.Integration.Test;
 
 public class SecondExampleQueueTests
     : QueueTestBase, IClassFixture<TestWebApplicationFactory>

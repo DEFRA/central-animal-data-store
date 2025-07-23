@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NSubstitute;
 
-namespace CAS.Test.TestUtils;
+namespace CAS.Integration.Test.TestUtils;
 
 public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {
