@@ -13,23 +13,23 @@ public class QueueTestBase : IDisposable
     protected readonly MockedPersistenceWebApplicationFactory WebAppFactory;
     private IAmazonSQS SqsClient { get; }
     private IAmazonSimpleNotificationService SnsClient { get; }
-    
+
     private List<QueueDetails> CreatedQueues { get; } = new();
-    
+
     protected QueueTestBase(MockedPersistenceWebApplicationFactory factory)
     {
         WebAppFactory = factory;
-        
+
         var awsOptions = factory.Services.GetService<AWSOptions>();
         if (awsOptions == null)
         {
             throw new NullReferenceException("You must provide AWS Configuration options");
         }
-        
+
         SqsClient = awsOptions.CreateServiceClient<IAmazonSQS>();
         SnsClient = awsOptions.CreateServiceClient<IAmazonSimpleNotificationService>();
     }
-    
+
     protected QueueDetails SetupQueue(IServiceProvider services, string queueName)
     {
         var topicReq = new CreateTopicRequest()
@@ -61,9 +61,9 @@ public class QueueTestBase : IDisposable
 
         var subscriptionArn = SnsClient.SubscribeAsync(subsReq).Result.SubscriptionArn;
         var deets = new QueueDetails(topicArn, queueUrl, subscriptionArn);
-            CreatedQueues.Add(deets);
+        CreatedQueues.Add(deets);
 
-            return deets;
+        return deets;
     }
 
     protected async Task PublishMessageAsync(string message, string topicArn)
@@ -75,37 +75,37 @@ public class QueueTestBase : IDisposable
         };
 
         await SnsClient.PublishAsync(request);
-        
+
         // Wait for message poll
         Thread.Sleep(TimeSpan.FromSeconds(10));
     }
-    
+
     private void TearDownQueues()
-     {
-         foreach (var queue in CreatedQueues)
-         {
-             SnsClient.UnsubscribeAsync(queue.SubscriptionArn).Wait();
-             SqsClient.DeleteQueueAsync(queue.QueueUrl).Wait();
-             SnsClient.DeleteTopicAsync(queue.TopicArn).Wait();
-         }
-     }
-         
+    {
+        foreach (var queue in CreatedQueues)
+        {
+            SnsClient.UnsubscribeAsync(queue.SubscriptionArn).Wait();
+            SqsClient.DeleteQueueAsync(queue.QueueUrl).Wait();
+            SnsClient.DeleteTopicAsync(queue.TopicArn).Wait();
+        }
+    }
+
     protected virtual void Dispose(bool disposing)
-     {
-         if (disposing)
-         {
-             TearDownQueues();
+    {
+        if (disposing)
+        {
+            TearDownQueues();
 
-             SqsClient?.Dispose();
-             SnsClient?.Dispose();
-         }
-     }
+            SqsClient?.Dispose();
+            SnsClient?.Dispose();
+        }
+    }
 
-     public void Dispose()
-     {
-         Dispose(true);
-         GC.SuppressFinalize(this);
-     }
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
 
-     public record QueueDetails(string TopicArn, string QueueUrl, string SubscriptionArn);
+    public record QueueDetails(string TopicArn, string QueueUrl, string SubscriptionArn);
 }

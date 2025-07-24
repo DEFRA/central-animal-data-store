@@ -14,7 +14,7 @@ public class ExampleQueueTests
         Thread.Sleep(TimeSpan.FromSeconds(20));
         _queueDeets = SetupQueue(factory.Services, "example-queue");
     }
-    
+
     [Fact]
     public async Task MessagePublishToQueue_ShouldBeConsumed()
     {
@@ -22,13 +22,13 @@ public class ExampleQueueTests
         WebAppFactory.ExampleRepositoryMock
             .CreateAsync(Arg.Any<ExampleModel>(), Arg.Any<CancellationToken>())
             .Returns(Task.CompletedTask);
-        
+
         var message = "{ \"Message\": \"Hello World\" }";
         var sut = WebAppFactory.CreateClient();
-         
+
         // Act
         await this.PublishMessageAsync(message, _queueDeets.TopicArn);
-        
+
         // Assert
         await WebAppFactory.ExampleRepositoryMock.Received(1).CreateAsync(Arg.Any<ExampleModel>(), Arg.Any<CancellationToken>());
         await WebAppFactory.SecondExampleRepositoryMock.Received(0).CreateAsync(Arg.Any<SecondExampleModel>(), Arg.Any<CancellationToken>());

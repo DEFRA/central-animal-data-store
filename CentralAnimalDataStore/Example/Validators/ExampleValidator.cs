@@ -1,4 +1,4 @@
-﻿using CentralAnimalDataStore.Example.Models;
+using CentralAnimalDataStore.Example.Models;
 using FluentValidation;
 
 namespace CentralAnimalDataStore.Example.Validators;

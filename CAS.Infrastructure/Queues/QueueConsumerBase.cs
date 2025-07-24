@@ -37,7 +37,7 @@ public abstract class QueueConsumerBase<T> : IHostedService, IDisposable
     public Task StopAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("QueueConsumerBase Service stopping.");
-        
+
         return Task.CompletedTask;
     }
 
@@ -62,7 +62,7 @@ public abstract class QueueConsumerBase<T> : IHostedService, IDisposable
                         }, cancellationToken);
 
                     _logger.LogTrace($"Completed receive for: {_queueConsumerOptions.QueueUrl} Number of messages: {sqsResponse.Messages.Count}");
-                    
+
                     sqsResponse.Messages.ForEach(x =>
                     {
                         var payload = JsonSerializer.Deserialize<T>(x.Body);

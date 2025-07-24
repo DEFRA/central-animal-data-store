@@ -18,19 +18,19 @@ public static class CasCoreServiceExtensions
 
         services.AddTransient<ICoreFacade, CoreFacade>();
         services.AddTransient<IAnimalService, AnimalService>();
-        
+
         services.AddCasData();
         services.AddCasInfrastructure();
-        
+
         return services;
     }
-    
-    public static IServiceCollection AddQueueConsumers(this IServiceCollection services,  IConfiguration config)
+
+    public static IServiceCollection AddQueueConsumers(this IServiceCollection services, IConfiguration config)
     {
         services.AddDefaultAWSOptions(config.GetAWSOptions());
         services.AddAWSService<IAmazonSimpleNotificationService>();
         services.AddAWSService<IAmazonSQS>();
-        
+
         // Add Example Queue Consumer
         services.AddSingleton<IExampleRepository, ExampleRepository>();
         services.AddSingleton<ISecondExampleRepository, SecondExampleRepository>();

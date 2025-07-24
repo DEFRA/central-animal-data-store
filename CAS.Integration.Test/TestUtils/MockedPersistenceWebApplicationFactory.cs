@@ -10,7 +10,7 @@ public class MockedPersistenceWebApplicationFactory : WebApplicationFactory<Prog
 {
     public readonly IExampleRepository ExampleRepositoryMock = Substitute.For<IExampleRepository>();
     public readonly ISecondExampleRepository SecondExampleRepositoryMock = Substitute.For<ISecondExampleRepository>();
-    
+
     protected override IHost CreateHost(IHostBuilder builder)
     {
         builder.UseEnvironment("IntegrationTest");
@@ -19,7 +19,7 @@ public class MockedPersistenceWebApplicationFactory : WebApplicationFactory<Prog
             services.AddScoped<IExampleRepository>(x => ExampleRepositoryMock);
             services.AddScoped<ISecondExampleRepository>(x => SecondExampleRepositoryMock);
         });
-        
+
         return base.CreateHost(builder);
     }
 }
