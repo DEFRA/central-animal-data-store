@@ -47,8 +47,10 @@ public abstract class QueueConsumerBase<T> : IHostedService, IDisposable
     {
         Task.Run(async () =>
         {
+            _logger.LogInformation($"Connecting to queue: {_queueConsumerOptions.QueueUrl}");
             while (!cancellationToken.IsCancellationRequested)
             {
+                _logger.LogTrace($"Entering query loop for: {_queueConsumerOptions.QueueUrl}");
                 try
                 {
                     var sqsResponse = await _sqsClient.ReceiveMessageAsync(
@@ -59,6 +61,8 @@ public abstract class QueueConsumerBase<T> : IHostedService, IDisposable
                             WaitTimeSeconds = _queueConsumerOptions.WaitTimeSeconds
                         }, cancellationToken);
 
+                    _logger.LogTrace($"Completed receive for: {_queueConsumerOptions.QueueUrl} Number of messages: {sqsResponse.Messages.Count}");
+                    
                     sqsResponse.Messages.ForEach(x =>
                     {
                         var payload = JsonSerializer.Deserialize<T>(x.Body);
@@ -70,6 +74,7 @@ public abstract class QueueConsumerBase<T> : IHostedService, IDisposable
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError($"Unable to connect to queue: {_queueConsumerOptions.QueueUrl}");
                     // Wait for queue creation, refactor with Polly later
                     Thread.Sleep(1000);
                 }

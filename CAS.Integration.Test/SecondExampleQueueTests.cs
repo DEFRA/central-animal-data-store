@@ -5,11 +5,11 @@ using NSubstitute;
 namespace CAS.Integration.Test;
 
 public class SecondExampleQueueTests
-    : QueueTestBase, IClassFixture<TestWebApplicationFactory>
+    : QueueTestBase, IClassFixture<MockedPersistenceWebApplicationFactory>
 {
     private QueueDetails _queueDeets;
 
-    public SecondExampleQueueTests(TestWebApplicationFactory factory) : base(factory)
+    public SecondExampleQueueTests(MockedPersistenceWebApplicationFactory factory) : base(factory)
     {
         _queueDeets = SetupQueue(factory.Services, "second-queue");
     }

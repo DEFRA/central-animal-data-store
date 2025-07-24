@@ -10,13 +10,13 @@ namespace CAS.Integration.Test.TestUtils;
 [Trait("Dependence", "localstack")]
 public class QueueTestBase : IDisposable
 {
-    protected readonly TestWebApplicationFactory WebAppFactory;
+    protected readonly MockedPersistenceWebApplicationFactory WebAppFactory;
     private IAmazonSQS SqsClient { get; }
     private IAmazonSimpleNotificationService SnsClient { get; }
     
     private List<QueueDetails> CreatedQueues { get; } = new();
     
-    protected QueueTestBase(TestWebApplicationFactory factory)
+    protected QueueTestBase(MockedPersistenceWebApplicationFactory factory)
     {
         WebAppFactory = factory;
         
