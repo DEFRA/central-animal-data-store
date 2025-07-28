@@ -16,7 +16,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY . .
 RUN dotnet restore "CAS.Api/CAS.Api.csproj"
-RUN dotnet test CAS.Test
+RUN dotnet test CAS.Test/CAS.Test.csproj
 RUN dotnet build "CAS.Api/CAS.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build /p:UseAppHost=false
 
 
