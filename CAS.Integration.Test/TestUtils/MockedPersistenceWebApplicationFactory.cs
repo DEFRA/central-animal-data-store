@@ -23,13 +23,13 @@ public class MockedPersistenceWebApplicationFactory : WebApplicationFactory<Prog
         builder.ConfigureServices(services =>
         {
             var bob = WebApplication.CreateBuilder();
-            
+
             var options = bob.Configuration.GetAWSOptions();
             options.Credentials = new BasicAWSCredentials(
                 bob.Configuration["AWS_ACCESS_KEY_ID"],
                 bob.Configuration["AWS_SECRET_ACCESS_KEY"]
             );
-            
+
             services.Replace(new ServiceDescriptor(typeof(AWSOptions), options));
             services.AddScoped<IExampleRepository>(x => ExampleRepositoryMock);
             services.AddScoped<ISecondExampleRepository>(x => SecondExampleRepositoryMock);
