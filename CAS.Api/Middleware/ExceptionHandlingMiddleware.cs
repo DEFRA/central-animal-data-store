@@ -29,9 +29,9 @@ public sealed class ExceptionHandlingMiddleware
         {
             await _next(context);
         }
-        catch (ValidationException ex)
+        catch (FluentValidation.ValidationException ex)
         {
-            await HandleExceptionAsync(context, ex, correlationId, 422);
+            await HandleExceptionAsync(context, ex, correlationId, 422, "Unprocessable Content");
         }
         catch (PermissionDeniedException ex) //Should we also handle UnauthorizedAccessException (401)?
         {
@@ -83,6 +83,20 @@ public sealed class ExceptionHandlingMiddleware
             Status = statusCode,
             Instance = context.Request.Path
         };
+
+        if (exception is FluentValidation.ValidationException validationException)
+        {
+            var validationErrors = validationException.Errors
+                .GroupBy(e => e.PropertyName)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(e => e.ErrorMessage).ToArray()
+                );
+
+            problemDetails.Extensions["errors"] = validationErrors;
+            problemDetails.Detail = "One or more validation errors occurred. See the 'errors' field for details.";
+        }
+
         problemDetails.Extensions["traceId"] = correlationId;
         problemDetails.Extensions["correlationId"] = correlationId;
         problemDetails.Extensions["errorId"] = errorId;
@@ -96,7 +110,6 @@ public sealed class ExceptionHandlingMiddleware
         };
 
         var json = JsonSerializer.Serialize(problemDetails, jsonOptions);
-
         return context.Response.WriteAsync(json);
     }
 }
