@@ -26,7 +26,7 @@ public class QueueTestBase : IDisposable
         try
         {
             Console.WriteLine("test: entered try block");
-            var awsOptions = WebAppFactory.AWSOptions;
+            var awsOptions = WebAppFactory.AwsOptions;
         
             if (awsOptions == null)
             {
@@ -37,19 +37,6 @@ public class QueueTestBase : IDisposable
         
             SqsClient = awsOptions.CreateServiceClient<IAmazonSQS>();
             SnsClient = awsOptions.CreateServiceClient<IAmazonSimpleNotificationService>();
-            
-            // Console.WriteLine("test: entered try block");
-            // var awsOptions = WebAppFactory.AWSOptions;
-            //
-            // if (awsOptions == null)
-            // {
-            //     throw new NullReferenceException("You must provide AWS Configuration options");
-            // }
-            // var options = new JsonSerializerOptions { WriteIndented = true };
-            // Console.WriteLine($"test: pulled options [{JsonSerializer.Serialize(awsOptions, options)}]");
-            //
-            // SqsClient = awsOptions.CreateServiceClient<IAmazonSQS>();
-            // SnsClient = awsOptions.CreateServiceClient<IAmazonSimpleNotificationService>();
         }
         catch (Exception ex)
         {
@@ -58,7 +45,7 @@ public class QueueTestBase : IDisposable
         }
     }
 
-    protected QueueDetails SetupQueue(IServiceProvider services, string queueName)
+    protected QueueDetails SetupQueue(string queueName)
     {
         var topicReq = new CreateTopicRequest()
         {
@@ -102,7 +89,7 @@ public class QueueTestBase : IDisposable
             TopicArn = topicArn
         };
 
-        await SnsClient.PublishAsync(request);
+        var res = await SnsClient.PublishAsync(request);
 
         // Wait for message poll
         Thread.Sleep(TimeSpan.FromSeconds(10));
@@ -123,9 +110,6 @@ public class QueueTestBase : IDisposable
         if (disposing)
         {
             TearDownQueues();
-
-            SqsClient?.Dispose();
-            SnsClient?.Dispose();
         }
     }
 

@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Amazon.Extensions.NETCore.Setup;
 using Amazon.Runtime;
 using CAS.Core.Consumers;
@@ -17,13 +18,17 @@ public class MockedPersistenceWebApplicationFactory : WebApplicationFactory<Prog
 {
     public readonly IExampleRepository ExampleRepositoryMock = Substitute.For<IExampleRepository>();
     public readonly ISecondExampleRepository SecondExampleRepositoryMock = Substitute.For<ISecondExampleRepository>();
-    public AWSOptions AWSOptions{ get; private set; }
-    private WebApplicationBuilder _webApplicationBuilder;
+    public HttpClient? Client { get; private set; }
+    public AWSOptions AwsOptions{ get; private set; }
+    private readonly WebApplicationBuilder _webApplicationBuilder;
 
     public MockedPersistenceWebApplicationFactory()
     {
         Console.WriteLine("this was a lambda");
-        _webApplicationBuilder = WebApplication.CreateBuilder();
+        _webApplicationBuilder = WebApplication.CreateBuilder(new WebApplicationOptions
+        {
+            EnvironmentName = "IntegrationTest"
+        });
 
         var options = _webApplicationBuilder.Configuration.GetAWSOptions();
         options.Credentials = new BasicAWSCredentials(
@@ -31,60 +36,38 @@ public class MockedPersistenceWebApplicationFactory : WebApplicationFactory<Prog
             _webApplicationBuilder.Configuration["AWS_SECRET_ACCESS_KEY"]
         );
 
+        var serialiserOptions = new JsonSerializerOptions { WriteIndented = true };
+        Console.WriteLine($"factory: pulled options [{JsonSerializer.Serialize(options, serialiserOptions)}]");
+        ExampleRepositoryMock
+            .CreateAsync(Arg.Any<ExampleModel>(), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
+        SecondExampleRepositoryMock
+            .CreateAsync(Arg.Any<SecondExampleModel>(), Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
+        
         _webApplicationBuilder.Services.Replace(new ServiceDescriptor(typeof(AWSOptions), options));
         _webApplicationBuilder.Services.AddScoped<IExampleRepository>(x => ExampleRepositoryMock);
         _webApplicationBuilder.Services.AddScoped<ISecondExampleRepository>(x => SecondExampleRepositoryMock);
         _webApplicationBuilder.Services.AddSingleton<IServer, TestServer>();
         
-        AWSOptions = options;
+        AwsOptions = options;
+        Client ??= CreateClient();
     }
     
     protected override IHost CreateHost(IHostBuilder builder)
     {
-        var webApp = _webApplicationBuilder.Build();
-        webApp.Start();
-        return webApp;
-        //
-        // Console.WriteLine("this is a factory");
-        // builder.UseEnvironment("IntegrationTest");
-
-        // builder.ConfigureServices(services =>
-        // {
-        //     Console.WriteLine("this is a lambda");
-        //     var bob = WebApplication.CreateBuilder();
-        //
-        //     var options = bob.Configuration.GetAWSOptions();
-        //     options.Credentials = new BasicAWSCredentials(
-        //         bob.Configuration["AWS_ACCESS_KEY_ID"],
-        //         bob.Configuration["AWS_SECRET_ACCESS_KEY"]
-        //     );
-        //
-        //     services.Replace(new ServiceDescriptor(typeof(AWSOptions), options));
-        //     services.AddScoped<IExampleRepository>(x => ExampleRepositoryMock);
-        //     services.AddScoped<ISecondExampleRepository>(x => SecondExampleRepositoryMock);
-        //
-        //     bob.Build();
-        // });
-        //
-        // Console.WriteLine("this was a lambda");
-        // var bob = WebApplication.CreateBuilder();
-        //
-        // var options = bob.Configuration.GetAWSOptions();
-        // options.Credentials = new BasicAWSCredentials(
-        //     bob.Configuration["AWS_ACCESS_KEY_ID"],
-        //     bob.Configuration["AWS_SECRET_ACCESS_KEY"]
-        // );
-        //
-        // bob.Services.Replace(new ServiceDescriptor(typeof(AWSOptions), options));
-        // bob.Services.AddScoped<IExampleRepository>(x => ExampleRepositoryMock);
-        // bob.Services.AddScoped<ISecondExampleRepository>(x => SecondExampleRepositoryMock);
-        // bob.Services.AddSingleton<IServer, TestServer>();
-        //
-        // AWSOptions = options;
-        //
-        // var webApp = bob.Build();
+        builder.ConfigureServices(services =>
+        {
+            services.Replace(new ServiceDescriptor(typeof(AWSOptions), AwsOptions));
+            services.AddSingleton<IExampleRepository>(x => ExampleRepositoryMock);
+            services.AddSingleton<ISecondExampleRepository>(x => SecondExampleRepositoryMock);
+        });
+        
+        var derp = builder.Build();
+        derp.Start();
+        return derp;
+        // var webApp = _webApplicationBuilder.Build();
         // webApp.Start();
-        //
         // return webApp;
     }
 }
