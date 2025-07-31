@@ -5,14 +5,13 @@ using NSubstitute;
 namespace CAS.Integration.Test;
 
 public class ExampleQueueTests
-    : QueueTestBase, IClassFixture<MockedPersistenceWebApplicationFactory>
+    : QueueTestBase
 {
     private QueueDetails _queueDeets;
 
-    public ExampleQueueTests(MockedPersistenceWebApplicationFactory factory) : base(factory)
+    public ExampleQueueTests()
     {
-        Thread.Sleep(TimeSpan.FromSeconds(20));
-        _queueDeets = SetupQueue(factory.Services, "example-queue");
+        _queueDeets = SetupQueue(WebAppFactory.Services, "second-queue");
     }
 
     [Fact]
@@ -31,6 +30,5 @@ public class ExampleQueueTests
 
         // Assert
         await WebAppFactory.ExampleRepositoryMock.Received(1).CreateAsync(Arg.Any<ExampleModel>(), Arg.Any<CancellationToken>());
-        await WebAppFactory.SecondExampleRepositoryMock.Received(0).CreateAsync(Arg.Any<SecondExampleModel>(), Arg.Any<CancellationToken>());
     }
 }

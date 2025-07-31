@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Amazon.Extensions.NETCore.Setup;
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
@@ -10,24 +11,51 @@ namespace CAS.Integration.Test.TestUtils;
 [Trait("Dependence", "localstack")]
 public class QueueTestBase : IDisposable
 {
-    protected readonly MockedPersistenceWebApplicationFactory WebAppFactory;
-    private IAmazonSQS SqsClient { get; }
-    private IAmazonSimpleNotificationService SnsClient { get; }
+    protected static MockedPersistenceWebApplicationFactory? WebAppFactory;
+
+    private static IAmazonSQS SqsClient { get; }
+    private static IAmazonSimpleNotificationService SnsClient { get; }
 
     private List<QueueDetails> CreatedQueues { get; } = new();
 
-    protected QueueTestBase(MockedPersistenceWebApplicationFactory factory)
+    static QueueTestBase()
     {
-        WebAppFactory = factory;
-
-        var awsOptions = factory.Services.GetService<AWSOptions>();
-        if (awsOptions == null)
+        Console.WriteLine("test: set the factory");
+        WebAppFactory ??= new MockedPersistenceWebApplicationFactory();
+        
+        try
         {
-            throw new NullReferenceException("You must provide AWS Configuration options");
+            Console.WriteLine("test: entered try block");
+            var awsOptions = WebAppFactory.AWSOptions;
+        
+            if (awsOptions == null)
+            {
+                throw new NullReferenceException("You must provide AWS Configuration options");
+            }
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            Console.WriteLine($"test: pulled options [{JsonSerializer.Serialize(awsOptions, options)}]");
+        
+            SqsClient = awsOptions.CreateServiceClient<IAmazonSQS>();
+            SnsClient = awsOptions.CreateServiceClient<IAmazonSimpleNotificationService>();
+            
+            // Console.WriteLine("test: entered try block");
+            // var awsOptions = WebAppFactory.AWSOptions;
+            //
+            // if (awsOptions == null)
+            // {
+            //     throw new NullReferenceException("You must provide AWS Configuration options");
+            // }
+            // var options = new JsonSerializerOptions { WriteIndented = true };
+            // Console.WriteLine($"test: pulled options [{JsonSerializer.Serialize(awsOptions, options)}]");
+            //
+            // SqsClient = awsOptions.CreateServiceClient<IAmazonSQS>();
+            // SnsClient = awsOptions.CreateServiceClient<IAmazonSimpleNotificationService>();
         }
-
-        SqsClient = awsOptions.CreateServiceClient<IAmazonSQS>();
-        SnsClient = awsOptions.CreateServiceClient<IAmazonSimpleNotificationService>();
+        catch (Exception ex)
+        {
+            Console.WriteLine($"test: exception thrown [{ex.Message}]");
+            throw;
+        }
     }
 
     protected QueueDetails SetupQueue(IServiceProvider services, string queueName)
