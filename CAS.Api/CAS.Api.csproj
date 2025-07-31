@@ -10,13 +10,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CAS.Common\CAS.Common.csproj" />
-    <ProjectReference Include="..\CAS.Core\CAS.Core.csproj" />
-    <ProjectReference Include="..\CAS.Infrastructure\CAS.Infrastructure.csproj" />
+    <Compile Remove="Controllers\TestExceptionController.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Middleware\" />
+    <ProjectReference Include="..\CAS.Common\CAS.Common.csproj" />
+    <ProjectReference Include="..\CAS.Core\CAS.Core.csproj" />
+    <ProjectReference Include="..\CAS.Infrastructure\CAS.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
