@@ -22,19 +22,19 @@ public class QueueTestBase : IDisposable
     {
         Console.WriteLine("test: set the factory");
         WebAppFactory ??= new MockedPersistenceWebApplicationFactory();
-        
+
         try
         {
             Console.WriteLine("test: entered try block");
             var awsOptions = WebAppFactory.AwsOptions;
-        
+
             if (awsOptions == null)
             {
                 throw new NullReferenceException("You must provide AWS Configuration options");
             }
             var options = new JsonSerializerOptions { WriteIndented = true };
             Console.WriteLine($"test: pulled options [{JsonSerializer.Serialize(awsOptions, options)}]");
-        
+
             SqsClient = awsOptions.CreateServiceClient<IAmazonSQS>();
             SnsClient = awsOptions.CreateServiceClient<IAmazonSimpleNotificationService>();
         }
