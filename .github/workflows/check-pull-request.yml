@@ -39,7 +39,7 @@ jobs:
         run: ./working-dir/wait-for-docker-logs.sh localstack-emulator "Ready." 60
 
       - name: Test
-        run: dotnet test ./working-dir/CentralAnimalDataStore.sln --logger "GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true" --collect:"XPlat Code Coverage" --results-directory ./coverage
+        run: dotnet test ./working-dir/CentralAnimalDataStore.sln --collect:"XPlat Code Coverage" --results-directory ./coverage
 
       - name: install dotnet coverage
         run: dotnet tool install --global dotnet-coverage        
