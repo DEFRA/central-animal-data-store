@@ -1,5 +1,7 @@
 using CAS.Api.Bootstrap;
+using CAS.Api.Middleware;
 using CAS.Core;
+using Elastic.CommonSchema;
 using FluentValidation;
 using Serilog;
 
@@ -19,6 +21,7 @@ builder.Services.AddHeaderPropagation(options =>
         options.Headers.Add(traceHeader);
     }
 });
+
 builder.Services.AddHealthChecks();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddControllers();
@@ -27,8 +30,9 @@ builder.Services.AddQueueConsumers(builder.Configuration);
 
 var app = builder.Build();
 //app.UseHttpsRedirection();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
 
-public partial class Program { }
+public partial class Program { } 

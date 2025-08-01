@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Exceptions\NullMessageException.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CAS.Common\CAS.Common.csproj" />
     <ProjectReference Include="..\CAS.Data\CAS.Data.csproj" />
     <ProjectReference Include="..\CAS.Infrastructure\CAS.Infrastructure.csproj" />

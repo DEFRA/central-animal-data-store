@@ -69,7 +69,6 @@ jobs:
         with:
           recreate: true
           path: code-coverage-results.md
-
     ## SonarCloud
     ## Uncomment to unable SonarCloud scan
     ## Requires project to be set up in SonarCloud
