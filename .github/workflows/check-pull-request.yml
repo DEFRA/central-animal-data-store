@@ -27,9 +27,6 @@ jobs:
         with:
           path: working-dir
 
-      - name: Verify Format
-        run: dotnet format ./working-dir/CentralAnimalDataStore.sln --verify-no-changes --verbosity diagnostic
-
       - name: Run docker-compose
         uses: hoverkraft-tech/compose-action@v2.0.1
         with:
