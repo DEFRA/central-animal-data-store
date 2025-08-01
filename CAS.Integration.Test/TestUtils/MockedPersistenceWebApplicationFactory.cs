@@ -19,7 +19,7 @@ public class MockedPersistenceWebApplicationFactory : WebApplicationFactory<Prog
     public readonly IExampleRepository ExampleRepositoryMock = Substitute.For<IExampleRepository>();
     public readonly ISecondExampleRepository SecondExampleRepositoryMock = Substitute.For<ISecondExampleRepository>();
     public HttpClient? Client { get; private set; }
-    public AWSOptions AwsOptions{ get; private set; }
+    public AWSOptions AwsOptions { get; private set; }
     private readonly WebApplicationBuilder _webApplicationBuilder;
 
     public MockedPersistenceWebApplicationFactory()
@@ -44,16 +44,14 @@ public class MockedPersistenceWebApplicationFactory : WebApplicationFactory<Prog
         SecondExampleRepositoryMock
             .CreateAsync(Arg.Any<SecondExampleModel>(), Arg.Any<CancellationToken>())
             .Returns(Task.CompletedTask);
-        
         _webApplicationBuilder.Services.Replace(new ServiceDescriptor(typeof(AWSOptions), options));
         _webApplicationBuilder.Services.AddScoped<IExampleRepository>(x => ExampleRepositoryMock);
         _webApplicationBuilder.Services.AddScoped<ISecondExampleRepository>(x => SecondExampleRepositoryMock);
         _webApplicationBuilder.Services.AddSingleton<IServer, TestServer>();
-        
         AwsOptions = options;
         Client ??= CreateClient();
     }
-    
+
     protected override IHost CreateHost(IHostBuilder builder)
     {
         builder.ConfigureServices(services =>
@@ -62,7 +60,6 @@ public class MockedPersistenceWebApplicationFactory : WebApplicationFactory<Prog
             services.AddSingleton<IExampleRepository>(x => ExampleRepositoryMock);
             services.AddSingleton<ISecondExampleRepository>(x => SecondExampleRepositoryMock);
         });
-        
         var derp = builder.Build();
         derp.Start();
         return derp;
