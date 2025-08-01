@@ -14,7 +14,7 @@ namespace CAS.Test.Middleware;
 public class ExceptionHandlingMiddlewareTests
 {
     private readonly TestLogger<ExceptionHandlingMiddleware> _testLogger;
-    private readonly string _traceHeader = "x-cdp-request-id"; 
+    private readonly string _traceHeader = "x-cdp-request-id";
 
     public ExceptionHandlingMiddlewareTests()
     {
@@ -116,7 +116,7 @@ public class ExceptionHandlingMiddlewareTests
 
     [Fact]
     public async Task NotFoundException_returns_404()
-    {      
+    {
         var context = CreateHttpContext("/test-path");
         var middleware = CreateMiddleware(_ => throw new NotFoundException("Sheep", 42));
 
@@ -203,7 +203,7 @@ public class ExceptionHandlingMiddlewareTests
 
         var problem = await GetProblemDetailsFromResponse(context);
         problem.Status.Should().Be(403);
-        problem.Title.Should().Be("Forbidden"); 
+        problem.Title.Should().Be("Forbidden");
     }
 
     [Fact]
@@ -264,7 +264,7 @@ public class ExceptionHandlingMiddlewareTests
 
     [Fact]
     public async Task TraceId_and_correlationId_are_same_when_no_header()
-    {  
+    {
         var context = CreateHttpContext();
         var middleware = CreateMiddleware(_ => throw new NotFoundException("Test", 1));
 
@@ -294,7 +294,7 @@ public class ExceptionHandlingMiddlewareTests
 
     [Fact]
     public async Task Uses_first_value_when_multiple_trace_headers()
-    {        
+    {
         var firstTraceId = "first-trace-12345";
         var secondTraceId = "second-trace-67890";
         var context = CreateHttpContext();

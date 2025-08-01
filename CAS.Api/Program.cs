@@ -26,6 +26,7 @@ builder.Services.AddHealthChecks();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddControllers();
 builder.Services.AddCasCore();
+builder.Services.AddQueueConsumers(builder.Configuration);
 
 var app = builder.Build();
 //app.UseHttpsRedirection();
@@ -34,4 +35,4 @@ app.UseAuthorization();
 app.MapControllers();
 app.Run();
 
-public partial class Program { } 
+public partial class Program { }
