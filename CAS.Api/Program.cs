@@ -26,6 +26,7 @@ builder.Services.AddHealthChecks();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddControllers();
 builder.Services.AddCasCore();
+builder.Services.AddQueueConsumers(builder.Configuration);
 
 var app = builder.Build();
 //app.UseHttpsRedirection();
