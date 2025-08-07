@@ -8,7 +8,7 @@ public static class CASInfraServiceExtensions
     {
         ArgumentNullException.ThrowIfNull(services);
 
-        
+
 
 
         return services;
