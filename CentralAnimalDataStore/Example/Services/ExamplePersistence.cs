@@ -1,4 +1,4 @@
-﻿using CentralAnimalDataStore.Example.Models;
+using CentralAnimalDataStore.Example.Models;
 using CentralAnimalDataStore.Utils.Mongo;
 using MongoDB.Driver;
 using System.Diagnostics.CodeAnalysis;

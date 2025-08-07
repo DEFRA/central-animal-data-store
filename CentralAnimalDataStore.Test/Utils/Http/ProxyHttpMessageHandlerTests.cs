@@ -4,7 +4,7 @@ namespace CentralAnimalDataStore.Test.Utils.Http;
 
 public class ProxyHttpMessageHandlerTests
 {
-    
+
     [Fact]
     public void ExtractsCredentialsFromUri()
     {
