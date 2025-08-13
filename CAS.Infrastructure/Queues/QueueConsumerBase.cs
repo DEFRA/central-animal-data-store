@@ -31,6 +31,12 @@ public abstract class QueueConsumerBase<T> : IHostedService, IDisposable
     {
         _logger.LogInformation("QueueConsumerBase Service started.");
 
+        if (_queueConsumerOptions?.Disabled == true)
+        {
+            _logger.LogInformation($"Queue [{_queueConsumerOptions.QueueUrl}] disabled in config");
+            return Task.CompletedTask;
+        }
+
         return ExecuteQueryLoop(cancellationToken);
     }
 
@@ -90,4 +96,5 @@ public record QueueConsumerOptions
     public string QueueUrl { get; init; }
     public int MaxNumberOfMessages { get; init; }
     public int WaitTimeSeconds { get; init; }
+    public bool Disabled { get; init; } = false;
 }

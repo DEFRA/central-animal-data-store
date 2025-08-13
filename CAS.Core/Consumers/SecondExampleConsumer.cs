@@ -22,7 +22,7 @@ public record SecondExampleConsumerOptions : QueueConsumerOptions;
 
 // Everything below here would normally be elsewhere in the application
 
-public record SecondExampleModel(string Message);
+public record SecondExampleModel(string DifferentShapedMessage);
 
 public interface ISecondExampleRepository
 {
