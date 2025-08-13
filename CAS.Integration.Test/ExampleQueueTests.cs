@@ -17,12 +17,13 @@ public class ExampleQueueTests : QueueTestBase
     public async Task MessagePublishToQueue_ShouldBeConsumed()
     {
         // Arrange
-        var message = "{ \"Message\": \"Hello World\" }";
+        var message = "Hello World";
+        var payload = $"{{ \"Message\": \"{message}\" }}";
 
         // Act
-        await this.PublishMessageAsync(message, _queueDeets.TopicArn);
+        await this.PublishMessageAsync(payload, _queueDeets.TopicArn);
 
         // Assert
-        await WebAppFactory!.ExampleRepositoryMock.Received(1).CreateAsync(Arg.Any<ExampleModel>(), Arg.Any<CancellationToken>());
+        await WebAppFactory!.ExampleRepositoryMock.Received(1).CreateAsync(Arg.Is<ExampleModel>(x => x.Message == message), Arg.Any<CancellationToken>());
     }
 }

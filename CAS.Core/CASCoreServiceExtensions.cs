@@ -34,10 +34,13 @@ public static class CasCoreServiceExtensions
         // Add Example Queue Consumer
         services.AddSingleton<IExampleRepository, ExampleRepository>();
         services.AddSingleton<ISecondExampleRepository, SecondExampleRepository>();
+        services.AddSingleton<IDisabledExampleRepository, DisabledExampleRepository>();
         services.AddHostedService<ExampleConsumer>()
-            .Configure<ExampleConsumerOptions>(config.GetSection("ExampleQueueConsumer"));
+            .Configure<ExampleConsumerOptions>(config.GetRequiredSection("ExampleQueueConsumer"));
         services.AddHostedService<SecondExampleConsumer>()
-            .Configure<SecondExampleConsumerOptions>(config.GetSection("SecondQueueConsumer"));
+            .Configure<SecondExampleConsumerOptions>(config.GetRequiredSection("SecondQueueConsumer"));
+        services.AddHostedService<DisabledExampleConsumer>()
+            .Configure<DisabledExampleConsumerOptions>(config.GetRequiredSection("DisabledQueueConsumer"));
         return services;
     }
 }
