@@ -20,7 +20,7 @@ public class QueueConsumerBaseTests
 
         // Act
         await sut.StartAsync(token);
-        
+
         // Assert
         mockSetup.Logger.Received(1).LogInformation("QueueConsumerBase Service started.");
         await mockSetup.SqsClient.Received(1)
@@ -48,7 +48,7 @@ public class QueueConsumerBaseTests
         // Arrange
         var mockSetup = CreateMocks();
         AddResponses(mockSetup, 500);
-        
+
         var source = new CancellationTokenSource();
         var token = source.Token;
         int receivedCalls = 0;
@@ -63,7 +63,7 @@ public class QueueConsumerBaseTests
             await sut.StopAsync(token);
             receivedCalls = sut.ReceivedMessages.Count();
         }
-        
+
         // Assert
         receivedCalls.Should().Be(3);
     }
@@ -81,7 +81,7 @@ public class QueueConsumerBaseTests
             await sut.StartAsync(token);
             await sut.StopAsync(token);
         }
-        
+
         // Assert
         mockSetup.SqsClient.Received(1).Dispose();
     }
@@ -92,7 +92,7 @@ public class QueueConsumerBaseTests
         // Arrange
         var mockSetup = CreateMocks();
         AddResponses(mockSetup, 500);
-        
+
         var token = new CancellationToken();
         int receivedCalls = 0;
 
@@ -104,13 +104,13 @@ public class QueueConsumerBaseTests
             await sut.StopAsync(token);
             receivedCalls = sut.ReceivedMessages.Count();
         }
-        
+
         // Assert
         receivedCalls.Should().Be(3);
     }
-    
+
     public record TestModel(string TestString, int TestInt);
-    
+
     private static HarnessSetup CreateMocks()
     {
         var logger = Substitute.For<ILogger<QueueConsumerBase<TestModel>>>();
