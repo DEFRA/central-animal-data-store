@@ -26,7 +26,9 @@ builder.Services.AddHealthChecks();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddControllers();
 builder.Services.AddCasCore();
+builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
 builder.Services.AddQueueConsumers(builder.Configuration);
+builder.Services.AddQueuePublishers(builder.Configuration);
 
 var app = builder.Build();
 //app.UseHttpsRedirection();

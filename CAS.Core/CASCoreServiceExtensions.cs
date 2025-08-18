@@ -1,6 +1,8 @@
 using Amazon.SimpleNotificationService;
 using Amazon.SQS;
 using CAS.Core.Consumers;
+using CAS.Core.Models;
+using CAS.Core.Publishers;
 using CAS.Core.Services;
 using CAS.Data;
 using CAS.Infrastructure;
@@ -27,8 +29,6 @@ public static class CasCoreServiceExtensions
 
     public static IServiceCollection AddQueueConsumers(this IServiceCollection services, IConfiguration config)
     {
-        services.AddDefaultAWSOptions(config.GetAWSOptions());
-        services.AddAWSService<IAmazonSimpleNotificationService>();
         services.AddAWSService<IAmazonSQS>();
 
         // Add Example Queue Consumer
@@ -41,6 +41,16 @@ public static class CasCoreServiceExtensions
             .Configure<SecondExampleConsumerOptions>(config.GetRequiredSection("SecondQueueConsumer"));
         services.AddHostedService<DisabledExampleConsumer>()
             .Configure<DisabledExampleConsumerOptions>(config.GetRequiredSection("DisabledQueueConsumer"));
+        return services;
+    }
+
+    public static IServiceCollection AddQueuePublishers(this IServiceCollection services, IConfiguration config)
+    {
+        services.AddAWSService<IAmazonSimpleNotificationService>();
+        
+        services.AddScoped<IQueuePublisher<ExampleModel>, ExampleQueuePublisher>()
+            .Configure<ExamplePublisherOptions>(config.GetRequiredSection("ExampleQueuePublisher"));
+        
         return services;
     }
 }

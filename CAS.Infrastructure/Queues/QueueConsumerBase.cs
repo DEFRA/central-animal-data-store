@@ -7,33 +7,26 @@ using Microsoft.Extensions.Options;
 
 namespace CAS.Infrastructure.Queues;
 
-public abstract class QueueConsumerBase<T> : IHostedService, IDisposable
+public abstract class QueueConsumerBase<T>(
+    ILogger<QueueConsumerBase<T>> logger,
+    IAmazonSQS sqsClient,
+    IOptions<QueueConsumerOptions> options)
+    : IHostedService, IDisposable
 {
-    private readonly QueueConsumerOptions _queueConsumerOptions;
-    private readonly ILogger<QueueConsumerBase<T>> _logger;
-    private readonly IAmazonSQS _sqsClient;
-
-    protected QueueConsumerBase(ILogger<QueueConsumerBase<T>> logger,
-        IAmazonSQS sqsClient,
-        IOptions<QueueConsumerOptions> options)
-    {
-        _logger = logger;
-        _sqsClient = sqsClient;
-        _queueConsumerOptions = options.Value as QueueConsumerOptions;
-    }
+    private readonly QueueConsumerOptions _queueConsumerOptions = options.Value;
 
     public void Dispose()
     {
-        _sqsClient.Dispose();
+        sqsClient.Dispose();
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("QueueConsumerBase Service started.");
+        logger.LogInformation("QueueConsumerBase Service started.");
 
         if (_queueConsumerOptions?.Disabled == true)
         {
-            _logger.LogInformation($"Queue [{_queueConsumerOptions.QueueUrl}] disabled in config");
+            logger.LogInformation($"Queue [{_queueConsumerOptions.QueueUrl}] disabled in config");
             return Task.CompletedTask;
         }
 
@@ -42,7 +35,7 @@ public abstract class QueueConsumerBase<T> : IHostedService, IDisposable
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("QueueConsumerBase Service stopping.");
+        logger.LogInformation("QueueConsumerBase Service stopping.");
 
         return Task.CompletedTask;
     }
@@ -53,13 +46,13 @@ public abstract class QueueConsumerBase<T> : IHostedService, IDisposable
     {
         Task.Run(async () =>
         {
-            _logger.LogInformation($"Connecting to queue: {_queueConsumerOptions.QueueUrl}");
+            logger.LogInformation($"Connecting to queue: {_queueConsumerOptions.QueueUrl}");
             while (!cancellationToken.IsCancellationRequested)
             {
-                _logger.LogTrace($"Entering query loop for: {_queueConsumerOptions.QueueUrl}");
+                logger.LogTrace($"Entering query loop for: {_queueConsumerOptions.QueueUrl}");
                 try
                 {
-                    var sqsResponse = await _sqsClient.ReceiveMessageAsync(
+                    var sqsResponse = await sqsClient.ReceiveMessageAsync(
                         new ReceiveMessageRequest
                         {
                             QueueUrl = _queueConsumerOptions.QueueUrl,
@@ -67,7 +60,7 @@ public abstract class QueueConsumerBase<T> : IHostedService, IDisposable
                             WaitTimeSeconds = _queueConsumerOptions.WaitTimeSeconds
                         }, cancellationToken);
 
-                    _logger.LogTrace($"Completed receive for: {_queueConsumerOptions.QueueUrl} Number of messages: {sqsResponse.Messages.Count}");
+                    logger.LogTrace($"Completed receive for: {_queueConsumerOptions.QueueUrl} Number of messages: {sqsResponse.Messages.Count}");
 
                     sqsResponse.Messages.ForEach(x =>
                     {
@@ -80,7 +73,7 @@ public abstract class QueueConsumerBase<T> : IHostedService, IDisposable
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"Unable to connect to queue: {_queueConsumerOptions.QueueUrl}");
+                    logger.LogError($"Unable to connect to queue: {_queueConsumerOptions.QueueUrl}");
                     // Wait for queue creation, refactor with Polly later
                     Thread.Sleep(1000);
                 }

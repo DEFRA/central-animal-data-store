@@ -2,6 +2,7 @@ using System.Text.Json;
 using Amazon.Extensions.NETCore.Setup;
 using Amazon.Runtime;
 using CAS.Core.Consumers;
+using CAS.Core.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Mvc.Testing;

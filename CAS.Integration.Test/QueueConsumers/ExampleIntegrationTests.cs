@@ -1,14 +1,15 @@
 using CAS.Core.Consumers;
+using CAS.Core.Models;
 using CAS.Integration.Test.TestUtils;
 using NSubstitute;
 
-namespace CAS.Integration.Test;
+namespace CAS.Integration.Test.QueueConsumers;
 
-public class ExampleQueueTests : QueueTestBase
+public class ExampleIntegrationTests : IntegrationTestBase
 {
     private QueueDetails _queueDeets;
 
-    public ExampleQueueTests()
+    public ExampleIntegrationTests()
     {
         _queueDeets = SetupQueue("example-queue");
     }

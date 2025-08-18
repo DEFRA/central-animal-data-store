@@ -2,13 +2,13 @@ using CAS.Core.Consumers;
 using CAS.Integration.Test.TestUtils;
 using NSubstitute;
 
-namespace CAS.Integration.Test;
+namespace CAS.Integration.Test.QueueConsumers;
 
-public class SecondExampleQueueTests : QueueTestBase
+public class SecondExampleIntegrationTests : IntegrationTestBase
 {
     private QueueDetails _queueDeets;
 
-    public SecondExampleQueueTests() : base()
+    public SecondExampleIntegrationTests()
     {
         _queueDeets = SetupQueue("second-queue");
     }

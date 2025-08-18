@@ -2,13 +2,13 @@ using CAS.Core.Consumers;
 using CAS.Integration.Test.TestUtils;
 using NSubstitute;
 
-namespace CAS.Integration.Test;
+namespace CAS.Integration.Test.QueueConsumers;
 
-public class DisabledExampleQueueTests : QueueTestBase
+public class DisabledExampleIntegrationTests : IntegrationTestBase
 {
     private QueueDetails _queueDeets;
 
-    public DisabledExampleQueueTests() : base()
+    public DisabledExampleIntegrationTests()
     {
         _queueDeets = SetupQueue("disabled-consumer-queue");
     }

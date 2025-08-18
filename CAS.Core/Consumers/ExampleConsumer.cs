@@ -1,4 +1,5 @@
 using Amazon.SQS;
+using CAS.Core.Models;
 using CAS.Infrastructure.Queues;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -21,8 +22,6 @@ public class ExampleConsumer(
 public record ExampleConsumerOptions : QueueConsumerOptions;
 
 // Everything below here would normally be elsewhere in the application
-
-public record ExampleModel(string Message);
 
 public interface IExampleRepository
 {

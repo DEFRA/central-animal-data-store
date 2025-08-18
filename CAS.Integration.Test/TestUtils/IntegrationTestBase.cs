@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using Amazon.Extensions.NETCore.Setup;
 using Amazon.SimpleNotificationService;
@@ -9,16 +10,17 @@ using Microsoft.Extensions.DependencyInjection;
 namespace CAS.Integration.Test.TestUtils;
 
 [Trait("Dependence", "localstack")]
-public class QueueTestBase : IDisposable
+public class IntegrationTestBase : IDisposable
 {
     protected static MockedPersistenceWebApplicationFactory? WebAppFactory;
 
     private static IAmazonSQS SqsClient { get; }
     private static IAmazonSimpleNotificationService SnsClient { get; }
+    private static HttpClient ApiClient { get; }
 
     private List<QueueDetails> CreatedQueues { get; } = new();
 
-    static QueueTestBase()
+    static IntegrationTestBase()
     {
         WebAppFactory ??= new MockedPersistenceWebApplicationFactory();
 
@@ -31,6 +33,7 @@ public class QueueTestBase : IDisposable
 
         SqsClient = awsOptions.CreateServiceClient<IAmazonSQS>();
         SnsClient = awsOptions.CreateServiceClient<IAmazonSimpleNotificationService>();
+        ApiClient = WebAppFactory.CreateClient();
     }
 
     protected QueueDetails SetupQueue(string queueName)
@@ -83,6 +86,31 @@ public class QueueTestBase : IDisposable
         Thread.Sleep(TimeSpan.FromSeconds(3));
     }
 
+    protected async Task<T?> ReceiveMessageAsync<T>(string queueUrl, CancellationToken cancellationToken = default)
+    {
+        var sqsResponse = await SqsClient.ReceiveMessageAsync(
+            new ReceiveMessageRequest
+            {
+                QueueUrl = queueUrl,
+                MaxNumberOfMessages = 1,
+                WaitTimeSeconds = 5
+            }, cancellationToken);
+
+        return JsonSerializer.Deserialize<T>(sqsResponse.Messages.FirstOrDefault()?.Body ?? string.Empty);
+    }
+
+    protected async Task<HttpResponseMessage> PostMessage<T>(T payload, string endpoint,
+        CancellationToken cancellationToken = default)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, endpoint)
+        {
+            Content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json")
+        };
+        
+        var response = await ApiClient.SendAsync(request, cancellationToken);
+        return response;
+    }
+    
     private void TearDownQueues()
     {
         foreach (var queue in CreatedQueues)
